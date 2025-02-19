@@ -1,0 +1,294 @@
+Common Display Filter Examples:
+IP Filter: ip.addr == 192.168.1.1 (Shows traffic to/from a specific IP address)
+Port Filter: tcp.port == 80 (Shows traffic on a specific port, like HTTP)
+Protocol Filter: http (Displays HTTP protocol traffic)
+
+HTTP GET FLOODING
+
+Display filter
+
+    http.request.method == "GET"
+
+DNS TUNNELING
+
+Display filter
+    dns
+
+SMB BRUTE FORCE
+Multiple login attempts are made via the SMB protocol, trying to guess valid credentials through repetitive trials.
+
+Display filter
+    smb.cmd == 0x73
+
+SYN FLOOD ATTACK
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter. Review the TCP headers and check if there’s a high volume of
+SYN packets without corresponding ACKs. If there are some ACK responses, look for unusually delayed ACKs or connection resets.
+
+Display filter
+    tcp.flags.syn == 1 && tcp.flags.ack == 0
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review the TCP headers and check if there’s a high volume of
+SYN packets without corresponding ACKs.
+If there are some ACK responses, look for unusually delayed
+ACKs or connection resets.
+
+DNS AMPLIFICATION
+Attackers use a small request to trigger large DNS responses, reflecting traffic back to the target and overwhelming it.
+
+Display filter
+    dns.qry.name
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Check the DNS response section for large-sized responses and
+unexpected source addresses.
+If response sizes seem normal, look at the TTL field for
+unusually low values.
+
+
+ICMP FLOODING (PING OF DEATH)
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter. Review the ICMP headers for a high frequency of Echo Request
+packets from a single source. If packet sizes are unusual, inspect for ICMP packets larger than the standard 64 bytes.
+
+Display filter
+    icmp
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review the ICMP headers for a high frequency of Echo Request
+packets from a single source.
+If packet sizes are unusual, inspect for ICMP packets larger than
+the standard 64 bytes.
+
+ARP SPOOFING
+An attacker sends falsified ARP messages, leading devices to link wrong MAC addresses with IP addresses.
+
+Display filter
+    arp.duplicate-address-frame
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Inspect the ARP header for mismatches between IP and MAC
+addresses.
+If there are no clear mismatches, check for ARP requests with
+identical source IPs but different MAC addresses.
+
+DNS POISONING
+DNS responses are altered or forged to redirect users to
+malicious websites instead of legitimate ones.
+
+Display filter
+    dns.flags.rcode != 0
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Analyze DNS response headers for mismatched IP addresses or
+altered TTL values.
+If there’s no direct mismatch, check the response time field for
+unexpected delays.
+
+
+SUSPICIOUS HTTP USERAGENT
+Attackers may use irregular User-Agent strings to mask
+their identity or avoid detection during attacks.
+
+Display filter
+    http.user_agent
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Examine the HTTP headers for unusual or malformed UserAgent strings.
+If the User-Agent is not obviously suspicious, correlate requests
+with known malicious IP addresses.
+
+FTP PLAINTEXT AUTHENTICATION
+FTP transmits login credentials in plaintext, making them
+vulnerable to interception by attackers.
+
+Display filter
+    ftp.request.command == "USER"
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review FTP request headers for visible usernames and
+passwords.
+If no clear credentials are visible, inspect packet payloads for
+plaintext data in the FTP stream.
+
+BRUTE FORCE LOGIN (SSH)
+Attackers repeatedly attempt to guess valid SSH credentials, exploiting weak or default passwords.
+
+Display filter
+    ssh
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Look for repetitive login attempts in the SSH connection
+handshake fields.
+If there are fewer attempts, analyze the session duration for
+failed vs successful logins.
+
+DHCP STARVATION ATTACK
+Attackers request multiple DHCP leases, depleting available
+IP addresses to prevent legitimate network access.
+
+Display filter
+    dhcp
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Analyze the DHCP transaction ID for a high number of requests
+without corresponding DHCP Offers.
+If offers are present, check for quick lease time expiration in the
+DHCP header.
+
+SUSPICIOUS TLS CERTIFICATE
+Attackers use invalid or self-signed TLS certificates to
+compromise encrypted communications.
+
+Display filter
+    ssl.handshake.type == 11
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review the SSL handshake header for certificates signed by
+unknown authorities.
+If the certificate seems valid, verify the encryption protocol used
+for downgrade attempts.
+
+TELNET CLEARTEXT TRANSMISSION
+Telnet transmits all data, including passwords, in plaintext,
+making it easily interceptable by attackers.
+
+Display filter
+    telnet
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Check for visible login credentials in the Telnet data fields.
+If no credentials are visible, inspect for suspicious command
+execution strings in the payload.
+
+UNAUTHORIZED RDP ACCESS
+Attackers attempt unauthorized access to a system via
+Remote Desktop Protocol (RDP) to take control of the system.
+
+Display filter
+    tcp.port == 3389
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Inspect RDP header fields for repeated connection attempts
+from the same IP.
+If the source IP changes, review session IDs for abnormal
+session initiation patterns.
+
+PORT SCANNING
+Attackers scan for open ports on a system to find vulnerabilities and identify services to exploit.
+
+Display filter
+    tcp.flags.syn == 1 && tcp.flags.ack == 0
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review the TCP flags in headers for SYN packets across
+different ports.
+If SYN-ACK responses are present, inspect for suspicious
+response delays or resets.
+
+SMTP EXFILTRATION
+Sensitive information is extracted from a network by sending
+it out via email using the SMTP protocol.
+
+Display filter
+    smtp
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review SMTP headers for large or abnormal email attachments.
+If attachment size seems normal, inspect destination domains
+for unauthorized or unknown email addresses.
+
+ROGUE DHCP SERVER
+A rogue DHCP server assigns unauthorized IP addresses, redirecting network traffic or causing denial of service.
+
+Display filter
+    dhcp
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review the DHCP Offer packets and compare the DHCP server
+IP address to authorized DHCP servers.
+If server IPs match, check for abnormal lease durations or lease
+renewals in the DHCP headers.
+
+SQL INJECTION ATTACK
+Malicious SQL code is injected into vulnerable input fields,
+granting attackers unauthorized access to the database.
+
+Display filter
+    http.request.uri contains "SELECT"
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review HTTP request URIs for SQL commands like SELECT,
+DROP, or INSERT within the URL or payload.
+If no SQL commands are found, inspect HTTP headers for error
+responses that could indicate failed injection attempts.
+
+VOIP EAVESDROPPING (SIP)
+Attackers intercept Voice over IP (VoIP) traffic, allowing them
+to listen in on private conversations.
+
+Display filter
+    sip
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Check the SIP headers for unauthorized call setups or unknown
+user IDs initiating the call.
+If calls seem normal, analyze the RTP streams for abnormal
+traffic patterns or packet loss
+
+MALWARE COMMAND & CONTROL TRAFFIC
+Malware communicates with a Command & Control (C2) server to receive instructions for further malicious activity.
+
+Display filter
+    http contains "cmd.exe"
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review the HTTP request payloads for command execution
+instructions such as cmd.exe.
+If no commands are found, check for suspicious external server
+connections, especially to uncommon IPs.
+
+SSL DOWNGRADE ATTACK
+Attackers force the use of weaker SSL/TLS encryption protocols, reducing security and allowing for interception or decryption.
+
+Display filter
+    ssl.record.version < 0x0303
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Check the SSL/TLS handshake headers for negotiation with
+older protocol versions like SSL 2.0 or 3.0.
+If SSL/TLS versions are acceptable, inspect certificate chains for
+self-signed or expired certificates.
+
+SUSPICIOUS HTTP POST REQUESTS
+Attackers use HTTP POST requests to upload files or send
+data to a server, which may be used for data exfiltration or
+malicious uploads.
+
+Display filter
+    http.request.method == "POST"
+
+How to detect?
+Open Wireshark, navigate to the filter bar, and enter the abovementioned display filter.
+Review HTTP headers for POST requests with unusually large
+payloads or requests to unknown IP addresses.
+If payload sizes are small, inspect the content of the POST body
+for base64-encoded or binary data.
